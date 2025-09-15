@@ -58,9 +58,9 @@ streamlit run rag.py
     5. Enable Show Chat History in the sidebar to review past interactions
 
 🖼️ Screenshots
-Chat Interface
+![Main App Screenshot](Chat Interface.png)
 
-QA from added resource
+![QA Interface](QA from added resource.png)
 
 🔗 Example
 Question: What is LangChain?
@@ -77,3 +77,4 @@ Improve source highlighting in the answer text
 
 
 This project is licensed under MIT License – see the LICENSE file for details.
+
