@@ -1,18 +1,15 @@
 # 💬 Modern RAG Chatbot
-
-A sleek **Retrieval-Augmented Generation (RAG) chatbot** built with **Streamlit** and **LangChain**, allowing you to ask questions and get answers directly sourced from websites you add. Answers include **clickable references** to the original sources for easy verification.
+A modern **Retrieval-Augmented Generation (RAG)** chatbot built with **Streamlit**, **LangChain**, and **Groq LLMs**.  
+Ask questions from multiple websites, get real-time answers, and see clickable references — all wrapped in a sleek chat-bubble UI. 
 
 ---
-
 ## 🔹 Features
-
-- **Add websites dynamically**.  
-- **Remove websites safely** without crashing the app.  
-- Answers are generated **only from the content of the websites you added**.  
-- **Clickable sources** in answers, opening in a new tab.  
-- **Live streaming** of LLM responses using **Groq LLaMA-3.1**.  
-- Optional **chat history display** with source links.  
-- Copy answers directly for your convenience.  
+- 🔗 **Add any website** — build a knowledge base from live web pages.  
+- 📑 **Smart document splitting** — configurable chunk size & overlap.  
+- 🤖 **LLM-powered answers** — uses Groq's **Llama 3.1 8B Instant** model.  
+- 💬 **Modern chat bubbles** — clean, WhatsApp-style conversation UI.  
+- 📚 **Source attribution** — shows only the references actually used in answers.  
+- 🗑️ **Manage chat history** — clear or review past Q&A anytime.  
 
 ---
 
@@ -27,13 +24,11 @@ A sleek **Retrieval-Augmented Generation (RAG) chatbot** built with **Streamlit*
 ---
 
 ## 🛠️ Tech Stack
-
-- **Python 3.10+**  
-- **Streamlit** – for the interactive web UI  
-- **LangChain** – for RAG pipeline  
-- **Chroma** – vector database for document embeddings  
-- **OpenAI Embeddings** – text embeddings  
-- **Groq LLaMA-3.1-8B** – LLM for answer generation  
+- [Streamlit](https://streamlit.io/) – interactive web UI  
+- [LangChain](https://www.langchain.com/) – document loading, splitting & retrieval  
+- [Chroma](https://www.trychroma.com/) – vector database for semantic search  
+- [Groq](https://groq.com/) – blazing-fast inference for LLMs  
+- [OpenAI Embeddings](https://platform.openai.com/) – vector embeddings for docs  
 
 ---
 
@@ -42,7 +37,7 @@ A sleek **Retrieval-Augmented Generation (RAG) chatbot** built with **Streamlit*
 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/pathareprashant5/web-rag-chatbot.git
+git clone https://github.com/pathareprashant5/modern-rag-chatbot.git
 cd web-rag-chatbot
 
 2️⃣ Install dependencies
@@ -57,30 +52,28 @@ streamlit run rag.py
 
 📌 Usage
     1. Add websites.
-
     2. Ask a question in the main panel.
-
     3. The bot will stream its answer, and below it will display sources that were actually used.
-
     4. Remove websites using the ❌ buttons in the sidebar if needed.
-
     5. Enable Show Chat History in the sidebar to review past interactions
+
+🖼️ Screenshots
+Chat Interface
+
+QA from added resource
 
 🔗 Example
 Question: What is LangChain?
-
 Answer: LangChain is a framework for building applications powered by language models...
 Sources:
 - 🔗 [View Source](https://www.langchain.com/docs)
 
 💡 Future Improvements
-
 Support PDFs, YouTube transcripts, and local documents as additional sources.
-
 Add user authentication to save private chat history.
-
 Improve source highlighting in the answer text
 
 📝 License
+
 
 This project is licensed under MIT License – see the LICENSE file for details.
