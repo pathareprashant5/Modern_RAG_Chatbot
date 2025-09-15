@@ -39,6 +39,10 @@ st.header("Website Management")
 if "urls" not in st.session_state:
     st.session_state["urls"] = []
 
+# Ensure version counter exists to control cache invalidation for vectorstore
+if "_docs_version" not in st.session_state:
+    st.session_state["_docs_version"] = 0
+
 # Add new website
 url_input = st.text_input("Enter website URL:", placeholder="https://example.com")
 if st.button("Add Website") and url_input:
@@ -54,7 +58,6 @@ if st.session_state["urls"]:
         if cols[1].button("❌", key=f"remove_{i}"):
             st.session_state["urls"].pop(i)
             st.success(f"Website removed: {url}")
-            
             # Safe rerun by updating a dummy state variable
             if "rerun_trigger" not in st.session_state:
                 st.session_state["rerun_trigger"] = 0
@@ -63,7 +66,6 @@ if st.session_state["urls"]:
 # -----------------------------
 # Clear chat history
 # -----------------------------
-
 if "confirm_clear" not in st.session_state:
     st.session_state["confirm_clear"] = False
 
@@ -91,10 +93,11 @@ if "chat_history" not in st.session_state:
 # -----------------------------
 # Load & split documents
 # -----------------------------
+# NOTE: parameter name starts with underscore so Streamlit will NOT attempt to hash the list
 @st.cache_data(show_spinner=True)
-def load_docs(urls, chunk_size=500, chunk_overlap=100):
+def load_docs(_urls, chunk_size=500, chunk_overlap=100):
     all_docs = []
-    for url in urls:
+    for url in _urls:
         loader = WebBaseLoader(web_paths=[url])
         docs = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
@@ -104,8 +107,12 @@ def load_docs(urls, chunk_size=500, chunk_overlap=100):
 # -----------------------------
 # Create vectorstore
 # -----------------------------
+# Use a simple integer version as the cache key. The function reads docs from session_state.
 @st.cache_resource(show_spinner=True)
-def create_vectorstore(docs):
+def create_vectorstore(_docs_version):
+    docs = st.session_state.get("docs", [])
+    if not docs:
+        raise ValueError("No documents available to create vectorstore.")
     vect = Chroma.from_documents(docs, embedding=OpenAIEmbeddings())
     return vect.as_retriever()
 
@@ -151,17 +158,26 @@ Answer:
 rag_chain = None
 if st.session_state["urls"]:
     with st.spinner("Loading websites and creating chatbot..."):
-        st.session_state["docs"] = load_docs(st.session_state["urls"], chunk_size, chunk_overlap)
-        retriever = create_vectorstore(st.session_state["docs"])
-        retriever.search_kwargs['k'] = 3
-        rag_chain = RetrievalQA.from_chain_type(
-            llm=llm,
-            retriever=retriever,
-            chain_type="stuff",
-            chain_type_kwargs={"prompt": custom_prompt},
-            return_source_documents=True
-        )
-    st.success("Knowledge base ready! You can now chat.")
+        # Load/split docs (load_docs takes _urls to avoid hashing lists)
+        docs = load_docs(st.session_state["urls"], chunk_size, chunk_overlap)
+        st.session_state["docs"] = docs
+
+        if docs:
+            # bump version to invalidate cached vectorstore when docs change
+            st.session_state["_docs_version"] = st.session_state.get("_docs_version", 0) + 1
+
+            retriever = create_vectorstore(st.session_state["_docs_version"])
+            retriever.search_kwargs['k'] = 3
+            rag_chain = RetrievalQA.from_chain_type(
+                llm=llm,
+                retriever=retriever,
+                chain_type="stuff",
+                chain_type_kwargs={"prompt": custom_prompt},
+                return_source_documents=True
+            )
+            st.success("Knowledge base ready! You can now chat.")
+        else:
+            st.warning("No documents were loaded from the provided websites. Check your URLs or network connection.")
 
 # -----------------------------
 # Temporary container for current answer
